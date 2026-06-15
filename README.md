@@ -1,79 +1,132 @@
-# SplitSense
+# SplitSense 💸
 
-SplitSense is a robust, production-ready shared expense tracker designed to process messy real-world CSV data, handle complex splits, and manage temporal group memberships. It features a built-in AI Data Analyst (**Audit AI**) to help you analyze your spending, detect anomalies, and settle up fairly.
+SplitSense is an advanced, production-ready shared expense tracker and financial management platform. Designed specifically to handle messy, real-world data, it excels at parsing unstructured CSV files, executing complex splits, and managing dynamic groups where members come and go. 
 
-## ✨ Key Features
+It is also powered by **Audit AI**, an intelligent chatbot that acts as your personal financial analyst—identifying anomalies, summarizing your data, and ensuring everyone pays exactly their fair share.
 
-- **Automated CSV Imports**: Effortlessly upload messy, unstructured CSV datasets of your transactions. SplitSense automatically parses the data, identifying payers, payees, and amounts.
-- **Advanced Splitting Algorithms**: Supports complex bill splitting scenarios (equal splits, percentage splits, custom amounts) and calculates "Who owes Whom" seamlessly.
-- **Temporal Group Memberships**: Correctly accounts for members joining and leaving a group over time. If a member wasn't part of the group when an expense was incurred, they won't be charged!
-- **Intelligent Anomaly Detection**: Automatically flags duplicate transactions, suspiciously high expenses, and unusual spending patterns so you never accidentally overpay.
-- **Audit AI (Chatbot)**: A smart, conversational AI assistant that can answer questions about your data. Ask it things like:
-  - *"How much did I spend on groceries last month?"*
-  - *"Are there any duplicated electricity bills?"*
-  - *"Who owes me the most money?"*
-- **Real-time Balances & Settlements**: Get instant snapshots of group balances and automatically compute the optimal settlement path to minimize the number of transactions needed to settle all debts.
-- **Beautiful, Responsive UI**: A premium user interface crafted with TailwindCSS, Framer Motion for smooth animations, and Recharts for interactive financial visualizations.
+---
 
-## 🛠 Tech Stack
+## 🌟 Core Features & Capabilities
 
-- **Framework**: [Next.js (App Router)](https://nextjs.org/)
-- **Styling**: [TailwindCSS](https://tailwindcss.com/) & [Framer Motion](https://www.framer.com/motion/)
-- **Database**: PostgreSQL hosted on [Supabase](https://supabase.com/)
-- **ORM / Driver**: [Postgres.js](https://github.com/porsager/postgres)
-- **Authentication**: [NextAuth.js](https://next-auth.js.org/)
-- **Data Visualization**: [Recharts](https://recharts.org/)
+### 1. 🧠 Audit AI (Built-in Data Analyst)
+SplitSense includes a smart, context-aware chatbot that queries your actual database to provide deep financial insights. Ask it complex questions in natural language:
+- *"Who owes me the most money right now?"*
+- *"Are there any unusually high electricity bills this year?"*
+- *"Summarize my grocery spending for the last 3 months."*
+- *"Did we accidentally log the Internet bill twice in March?"*
 
-## 🚀 Getting Started
+### 2. 🧮 Settlement Optimization Algorithm
+Instead of forcing everyone to pay back everyone else individually, SplitSense features a built-in debt simplification engine. It builds a directed graph of all group debts and simplifies the edges.
+- **Example:** If Alice owes Bob $10, and Bob owes Charlie $10, SplitSense simply tells Alice to pay Charlie $10. It minimizes the total number of transactions required to settle up.
 
-Follow these instructions to run the project locally.
+### 3. ⏳ Temporal Group Memberships
+Unlike simple splitters, SplitSense understands that life changes. Roommates move out, and new people move in. 
+- You can specify exact `joinedAt` and `leftAt` dates for any user.
+- If an expense is uploaded for a date when a member was *not* living in the house, they will **automatically be excluded** from the split.
+
+### 4. 🚨 Intelligent Anomaly Detection
+Stop overpaying for duplicate bills. When you upload a CSV, SplitSense runs a multi-layered anomaly detection scan:
+- **Duplicate Detection**: Flags rows with identical amounts, dates, and payers.
+- **Z-Score Analysis**: Compares new expenses against historical averages and standard deviations. If a $200 water bill suddenly spikes to $600, Audit AI will flag it as an anomaly before you pay it.
+
+### 5. 📥 Automated CSV Importer
+Drop in raw CSV files directly from your bank or manually kept spreadsheets. The intelligent parser will:
+- Extract payers, payees, dates, and amounts.
+- Generate missing users on the fly.
+- Bulk insert hundreds of rows in milliseconds using optimized Postgres transactions.
+
+---
+
+## 🏛️ Architecture & Tech Stack
+
+SplitSense is built for scale, performance, and a premium user experience.
+
+### Frontend
+- **Framework**: [Next.js 14+](https://nextjs.org/) (App Router paradigm)
+- **Styling**: [TailwindCSS](https://tailwindcss.com/) for utility-first styling.
+- **Animations**: [Framer Motion](https://www.framer.com/motion/) for smooth, declarative micro-animations, modals, and the ChatBot UI.
+- **Visualizations**: [Recharts](https://recharts.org/) for beautiful, responsive bar charts and balance graphs.
+- **Icons**: Lucide React.
+
+### Backend & Database
+- **Database**: PostgreSQL hosted on [Supabase](https://supabase.com/).
+- **Driver**: [Postgres.js](https://github.com/porsager/postgres) - extremely fast, strictly typed SQL template literals.
+- **Authentication**: [NextAuth.js](https://next-auth.js.org/) using custom JWT credentials strategies.
+- **State/Caching**: Optimized backend routines for bulk-inserts, minimizing network latency.
+
+---
+
+## 📁 Project Structure
+
+```text
+SplitSense/
+├── src/
+│   ├── app/                 # Next.js App Router Pages & API Routes
+│   │   ├── api/             # Backend REST Endpoints (auth, expenses, chat, anomalies)
+│   │   ├── anomalies/       # Anomaly detection dashboard
+│   │   ├── expenses/        # Expense feed and logging
+│   │   ├── groups/          # Group creation and management
+│   │   ├── import/          # CSV upload and parsing UI
+│   │   └── settlements/     # Debt simplification and payoff screens
+│   ├── components/          # Reusable React components (UI, ChatBot, Modals)
+│   ├── lib/                 # Core backend logic
+│   │   ├── import/          # CSV Parsing, Split calculation, Anomaly detection
+│   │   ├── balance-engine.ts# Core debt and balance calculator
+│   │   └── settlement-optimizer.ts # Graph-based debt simplification
+│   └── db/                  # Raw SQL schema initialization scripts
+├── init-db.ts               # Database setup utility script
+└── next.config.ts           # Next.js compiler settings
+```
+
+---
+
+## 🚀 Getting Started Locally
 
 ### 1. Clone the Repository
-
 ```bash
 git clone https://github.com/shyam-medh/SplitSense.git
 cd SplitSense
 ```
 
 ### 2. Install Dependencies
-
 ```bash
 npm install
 ```
 
-### 3. Set Up Environment Variables
-
-Create a `.env` file in the root directory and add the following variables:
+### 3. Environment Variables
+Create a `.env` file in the root directory. You will need a PostgreSQL connection string (preferably from Supabase or Neon).
 
 ```env
 # Your Supabase PostgreSQL Connection String
 DATABASE_URL="postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT].supabase.co:5432/postgres"
 
 # NextAuth Configuration
-NEXTAUTH_SECRET="your-super-secret-key"
+NEXTAUTH_SECRET="a-very-secure-random-string"
 NEXTAUTH_URL="http://localhost:3000"
 ```
 
-### 4. Initialize the Database
-
-SplitSense comes with a built-in script to automatically create the necessary database tables.
+### 4. Database Initialization
+SplitSense uses raw SQL migrations to ensure maximum performance. Run the initialization script to automatically create the `User`, `Group`, `Expense`, `ExpenseSplit`, `Settlement`, and `ImportLog` tables.
 
 ```bash
 npx tsx init-db.ts
 ```
 
-### 5. Run the Development Server
-
+### 5. Start the Development Server
 ```bash
 npm run dev
 ```
+Navigate to [http://localhost:3000](http://localhost:3000) to view the application.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result. You can now create an account, create a group, and start importing your expenses!
+---
 
-## 🧪 Testing the Importer
+## ☁️ Deployment
 
-If you have a CSV file of expenses, you can upload it directly via the UI on the **Import Expenses** page. The system will process it, run anomaly checks, and calculate your optimal settlements automatically.
+SplitSense is optimized for **Vercel**.
+1. Push your code to GitHub.
+2. Import the project in your Vercel Dashboard.
+3. Add your `DATABASE_URL` and `NEXTAUTH_SECRET` to the Vercel Environment Variables.
+4. Deploy!
 
-## 📄 License
-
+## 📜 License
 This project is open-source and available under the MIT License.
